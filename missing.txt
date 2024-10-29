@@ -1,0 +1,4 @@
+3,Banana,4kg
+12,Duck,3kg
+99,Oats,2kg
+97,Flowers,2g
