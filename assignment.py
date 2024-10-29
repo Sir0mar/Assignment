@@ -25,23 +25,7 @@ def login():
             elif value[1] == "chef":
                 print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 print(f"Hello, {value[0]}. This is your Chef Portal.")
-                # User registration and login system
-                while True:
-                    print("\n1. Register")
-                    print("2. Chef Management Menu")
-                    print("3. Logout")
-
-                    choice = input("Select your choice (1-3): ")
-
-                    if choice == '1':
-                        registration()
-                    elif choice == '2':
-                        chef_management_menu(value[0], user_name)
-                    elif choice == '3':
-                        print("Exiting program...")
-                        break
-                    else:
-                        print("Invalid choice! Please pick between (1-3).")
+                chef_management_menu(value[0], user_name)
                 break
             elif value[1] == "customer":
                 print("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -64,7 +48,7 @@ def validate_login(user_name, pass_word):
     with open("user.txt", "r") as file:
         for line in file:
             lst = line.strip().split(",")
-            if (lst[0] == user_name or lst[0] == user_name) and lst[0] == pass_word:
+            if (lst[1] == user_name or lst[2] == user_name) and lst[3] == pass_word:
                 return lst[0], lst[4]
     return None
 # --- login justification function ends ---
@@ -826,7 +810,7 @@ def delete_menu_item():
 def view_ingredients_list():
     lst = []
     i = 1
-    with open("ingredients.txt", "r") as file:
+    with open("missing_ingredients.txt", "r") as file:
         print("\n~~~~~~~~  The List of Ingredients   ~~~~~~~~")
         for line in file:
             lst = line.strip().split(",")
@@ -945,18 +929,18 @@ def save_ingredients(filename, ingredients):
             file.write(f"{ingredient[0]},{ingredient[1].title()},{ingredient[2]}\n")
 
 
-def order_missing_ingredient(ingredients):
-    ingredient_id = int(input("Add ingredient ID: "))
+def add_ingredient(ingredients):
+    ingredient_id = int(input("Assign ingredient ID: "))
     for ingredient in ingredients:
         if ingredient[0] == ingredient_id:
             print("Ingredient ID already exists. Please choose a different ID.")
             return
 
     name = input("Enter missing ingredient name: ")
-    quantity = input("Enter needed quantity: ")
+    quantity = input("Enter ingredient needed quantity: ")
     ingredients.append([ingredient_id, name, quantity])
-    save_ingredients("missing.txt", ingredients)
-    print("missing Ingredient requested successfully!")
+    save_ingredients("missing_ingredients.txt", ingredients)
+    print("Ingredient added successfully!")
 
 
 def edit_ingredient(ingredients):
@@ -965,7 +949,7 @@ def edit_ingredient(ingredients):
         if ingredient[0] == ingredient_id:
             ingredient[1] = input("Enter new ingredient name: ")
             ingredient[2] = input("Enter new ingredient quantity: ")
-            save_ingredients("ingredients.txt", ingredients)
+            save_ingredients("missing_ingredients.txt", ingredients)
             print("Ingredient updated successfully!")
             break
     else:
@@ -977,7 +961,7 @@ def delete_ingredient(ingredients):
     for ingredient in ingredients:
         if ingredient[0] == ingredient_id:
             ingredients.remove(ingredient)
-            save_ingredients("ingredients.txt", ingredients)
+            save_ingredients("missing_ingredients.txt", ingredients)
             print("Ingredient deleted successfully!")
             break
     else:
@@ -993,30 +977,13 @@ def view_ingredients(ingredients):
             print(f"- ID: {ingredient[0]}, Name: {ingredient[1]}, Quantity: {ingredient[2]}")
 
 
-def registration():
-    chef_name = input("Enter your name: ")
-    chef_username = input("Enter username: ")
-    chef_password = input("Enter password: ")
-    chef_email = input("Enter your Email: ")
-    with open("user.txt", "r") as file:
-        for line in file:
-            lst = line.strip().split(",")
-            if lst[0] == chef_username:
-                print("Username already exists. Please choose a different username.")
-                return
-
-    with open("user.txt", "a") as file:
-        file.write(f"{chef_name},{chef_username},{chef_email},{chef_password},chef\n")
-    print("User registered successfully!\n")
-
-
 def update_profile_chef(username):
     users = []
     found = False
     with open("user.txt", "r") as file:
         for line in file:
             lst = line.strip().split(",")
-            if lst[0] == username:
+            if lst[1] == username:
                 found = True
                 print("Current profile details:")
                 print(f"Username: {lst[1]}, Email: {lst[2]}")
@@ -1041,7 +1008,7 @@ def update_profile_chef(username):
 
 
 def chef_management_menu(name, username):
-    ingredients = load_ingredients("ingredients.txt")
+    ingredients = load_ingredients("missing_ingredients.txt")
     orders = []
     info = []
     with open("orders.txt", "r") as file:
@@ -1050,19 +1017,18 @@ def chef_management_menu(name, username):
             orders.append(info)
     while True:
         print("\nManagement Menu:")
-        print("1. order missing Ingredients")
-        print("2. Edit Ingredients")
+        print("1. order missing Ingredient")
+        print("2. Edit missing Ingredients")
         print("3. Delete Ingredients")
         print("4. View Ingredients")
         print("5. Update Order Status")
         print("6. View Orders")
         print("7. Update Profile")
         print("8. Logout")
-        print("9. Exit")
 
         choice = input("Enter your choice: ")
         if choice == "1":
-            order_missing_ingredient(ingredients)
+            add_ingredient(ingredients)
         elif choice == "2":
             edit_ingredient(ingredients)
         elif choice == "3":
@@ -1081,9 +1047,6 @@ def chef_management_menu(name, username):
         elif choice == "8":
             print(f"Goodbye, {name}!")
             return
-        elif choice == "9":
-            print("Exiting program...")
-            exit()
         else:
             print("Invalid choice. Please try again.")
 
